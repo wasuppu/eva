@@ -1,0 +1,50 @@
+#!/usr/bin/python
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from eva import Eva
+from sexp import Sexp
+
+eva = Eva()
+parser = Sexp()
+
+usage = '''usage: eva [<option>] <argument>
+-e <expr>, --eval <expr>
+    Evaluate <expr>, print result
+-f <file>, --file <file>
+    Execute expressions from <file>'''
+
+def run():
+    if len(sys.argv) == 1:
+        print('Welcome to Eva.')
+        print('Press Ctrl+c to Exit.')
+        try:
+            while True:
+                print('> ', end='')
+                inp = input()
+                code = parser.parse('(begin %s)'%(inp))
+                eva.evalGlobal(code)
+        except KeyboardInterrupt:
+            return ''
+    elif len(sys.argv) >= 3:
+        _path, mode, *args = sys.argv
+        if (mode == '-e' or mode == '--eval'):
+            exp = '(begin %s)'%(args[0])
+            code = parser.parse(exp)
+            eva.evalGlobal(code)
+            return
+
+        if (mode == '-f' or mode == '--file'):
+            path = args[0]
+            with open(path, 'r') as f:
+                source = f.read()
+                code = parser.parse('(begin %s)'%(source))
+                eva.evalGlobal(code)
+                return
+    else:
+        return usage
+
+if __name__ == '__main__':
+    run()

@@ -1,0 +1,28 @@
+(import Math)
+
+(var abs (prop Math abs))
+
+(var x (- 10))
+
+(print (abs x))
+
+(class Point null
+  (begin
+    (def constructor (self x y)
+      (begin
+        (set (prop self x) x)
+        (set (prop self y) y)))
+    (def calc (self)
+      (+ (prop self x) (prop self y)))))
+
+(class Point3D Point
+  (begin
+    (def constructor (self x y z)
+      (begin
+        ((prop (super Point3D) constructor) self x y)
+        (set (prop self z) z)))
+    (def calc (self)
+      (+ ((prop (super Point3D) calc) self)
+      (prop self z)))))
+(var p (new Point3D 10 20 30))
+(print "Value:" ((prop p calc) p))
