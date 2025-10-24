@@ -1,0 +1,46 @@
+#!/usr/bin/python
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from EvaTC import EvaTC
+from sexp import Sexp
+
+evaParser = Sexp()
+evaTC = EvaTC()
+
+usage = '''usage: eva-tc [<option>] <argument>
+-e <expr>, --eval <expr>
+    Evaluate <expr>, print result
+-f <file>, --file <file>
+    Execute expressions from <file>'''
+
+def tcGlobal(src, eva):
+    exp = evaParser.parse(f"(begin {src})")
+    try:
+        eva.tcGlobal(exp)
+        print('No errors!')
+    except Exception as e:
+        print(e)
+
+def main():
+    if len(sys.argv) >= 3:
+        _path, mode, *args = sys.argv
+        eva = EvaTC()
+
+        # 1. Direct expression:
+        if mode == '-e' or mode == '--eval':
+            exp = args[0]
+            return tcGlobal(exp, eva)
+
+        if mode == '-f' or mode == '--file':
+            path = args[0]
+            with open(path, 'r') as f:
+                src = f.read()
+                return tcGlobal(src, eva)
+    else:
+        print(usage)
+
+if __name__ == '__main__':
+    main()
